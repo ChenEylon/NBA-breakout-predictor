@@ -1,6 +1,8 @@
 # NBA Breakout Player Predictor
 
-End-to-end ML pipeline that identifies NBA players poised for a breakout season — using 15 years of historical data, ensemble models, SHAP explainability, and Claude-generated scouting reports.
+**[🚀 Live Demo → nba-breakout-predictor.streamlit.app](https://nba-breakout-predictor.streamlit.app)**
+
+End-to-end ML pipeline that identifies NBA players poised for a breakout season — using 15 years of historical data, ensemble models, and SHAP explainability.
 
 ![Python](https://img.shields.io/badge/Python-3.10+-blue?logo=python)
 ![Streamlit](https://img.shields.io/badge/Streamlit-1.35+-red?logo=streamlit)
