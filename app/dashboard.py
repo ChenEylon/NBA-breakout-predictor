@@ -162,6 +162,19 @@ elif "Deep Dive" in view:
 
     # --- Radar chart: current vs prior season ---
     st.subheader("Stat Radar: 2025-26 vs Prior Season")
+    with st.expander("📖 What do these stats mean?"):
+        st.markdown("""
+| Stat | Full Name | What it measures |
+|---|---|---|
+| **PTS** | Points per game | Raw scoring volume |
+| **AST** | Assists per game | Playmaking and court vision |
+| **REB** | Rebounds per game | Presence on the boards (offensive + defensive) |
+| **TS%** | True Shooting % | Shooting efficiency accounting for 2s, 3s, and free throws — more accurate than FG% |
+| **USG%** | Usage Rate | % of team possessions used by the player while on the floor — proxy for role and trust |
+| **PIE** | Player Impact Estimate | NBA's all-in-one impact metric — how much a player contributes to winning relative to all players on the court |
+
+The radar shows **2025-26 (blue)** vs **prior season (red)**, normalised so the league leader in each stat = 1.0. A growing shape means the player is trending up.
+        """)
     radar_stats = ["pts", "ast", "reb", "ts_pct", "usg_pct", "pie"]
     radar_labels = ["PTS", "AST", "REB", "TS%", "USG%", "PIE"]
 
@@ -218,6 +231,17 @@ elif "Deep Dive" in view:
 
     # --- SHAP waterfall ---
     st.subheader("SHAP Feature Importance")
+    with st.expander("📖 What is SHAP?"):
+        st.markdown("""
+**SHAP** (SHapley Additive exPlanations) explains *why* the model gave a player their breakout probability.
+
+Each bar shows how much a single feature pushed the prediction **up** (green) or **down** (red).
+- A long green bar for *Prior PIE* means "this player's PIE last season is a strong reason to predict a breakout"
+- A red bar means that feature is actually working against them
+
+The values are in log-odds units — think of them as the raw signal before converting to a probability.
+This makes the model transparent: you're not just getting a number, you're seeing the reasoning behind it.
+        """)
     shap_feats = ctx.get("top_shap_features", [])
     if shap_feats:
         shap_df = pd.DataFrame(shap_feats)
@@ -244,6 +268,20 @@ elif "Deep Dive" in view:
 elif "Performance" in view:
     st.title("📊 Model Performance")
     st.caption("Evaluated on 2025-26 held-out validation season.")
+    with st.expander("📖 How to read these results"):
+        st.markdown("""
+Three models were trained on 2010–2025 season data and evaluated on the **2025-26 held-out season** (data the model never saw during training).
+
+| Metric | What it means |
+|---|---|
+| **Precision** | Of the players we flagged as breakout candidates, what % actually broke out. Higher = fewer false alarms. |
+| **Recall** | Of all players who actually broke out, what % did we catch. Higher = fewer missed breakouts. |
+| **F1** | Harmonic mean of precision and recall — balances both. |
+| **AUC-ROC** | How well the model separates breakouts from non-breakouts across *all* thresholds (1.0 = perfect, 0.5 = random). |
+| **Avg Precision** | Area under the Precision-Recall curve — better than AUC-ROC for imbalanced datasets like this one (~14% breakout rate). |
+
+**Why LightGBM was selected:** Precision was prioritised over recall. In a scouting tool, a short list of high-confidence picks is more useful than a long list with lots of noise. LightGBM's 56% precision is 4× above the 14% random baseline.
+        """)
 
     if not metrics:
         st.error("metrics.json not found. Run `python src/models/train.py` first.")
