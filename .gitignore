@@ -1,0 +1,14 @@
+venv/
+__pycache__/
+*.pyc
+*.pyo
+.env
+data/nba.db
+data/raw/
+# model artifacts and features are committed for Streamlit Cloud deployment
+# models/*.joblib
+# data/features.parquet
+reports/
+.DS_Store
+*.egg-info/
+.pytest_cache/
