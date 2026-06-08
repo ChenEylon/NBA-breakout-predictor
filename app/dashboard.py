@@ -25,7 +25,6 @@ from src.features.engineer import load_features, get_feature_columns, LAG_STATS
 from src.explainability.shap_explainer import run as get_shap_candidates
 
 MODELS_DIR = ROOT / "models"
-REPORTS_DIR = ROOT / "reports"
 
 # --------------------------------------------------------------------------
 st.set_page_config(page_title="NBA Breakout Predictor 2027", layout="wide", page_icon="🏀")
@@ -65,13 +64,6 @@ def load_val_data():
     available = [c for c in feat_cols if c in val.columns]
     X = val[available].fillna(val[available].median(numeric_only=True))
     return val, X, available
-
-
-def load_report(player_id) -> str | None:
-    p = REPORTS_DIR / f"{player_id}.json"
-    if p.exists():
-        return json.loads(p.read_text()).get("report")
-    return None
 
 
 # --------------------------------------------------------------------------
@@ -243,21 +235,6 @@ elif "Deep Dive" in view:
             height=350,
         )
         st.plotly_chart(fig_shap, use_container_width=True)
-
-    # --- LLM scouting report ---
-    st.subheader("📝 Scouting Report")
-    player_id = abs(hash(selected)) % (10**9)
-    report = load_report(player_id)
-
-    if report:
-        st.markdown(report)
-    else:
-        st.info(
-            "Scouting report not yet generated. Run:\n\n"
-            "```bash\n"
-            "ANTHROPIC_API_KEY=your-key python src/explainability/llm_reporter.py\n"
-            "```"
-        )
 
 
 # --------------------------------------------------------------------------

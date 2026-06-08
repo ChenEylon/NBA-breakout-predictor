@@ -7,7 +7,6 @@ End-to-end ML pipeline that identifies NBA players poised for a breakout season 
 ![LightGBM](https://img.shields.io/badge/LightGBM-4.0+-green)
 ![XGBoost](https://img.shields.io/badge/XGBoost-2.0+-orange)
 ![SHAP](https://img.shields.io/badge/SHAP-Explainability-purple)
-![Claude](https://img.shields.io/badge/Claude-Anthropic-blueviolet)
 
 ---
 
@@ -19,7 +18,7 @@ The pipeline:
 1. Pulls 15+ seasons of per-game and advanced stats from the official NBA Stats API
 2. Engineers 60+ features capturing player trajectory (lag stats, year-over-year deltas, team changes, usage trends)
 3. Trains and compares three ensemble models with class-imbalance handling and threshold optimization
-4. Explains every prediction with SHAP values, then feeds those drivers to Claude to produce natural-language scouting reports
+4. Explains every prediction with SHAP values showing which features drove each player's score
 5. Presents everything in an interactive Streamlit dashboard
 
 ---
@@ -30,24 +29,24 @@ The pipeline:
 NBA Stats API
      │
      ▼
- SQLite DB  ──────────────────────────────────────────────────────┐
-(nba.db)                                                          │
-     │                                                            │
-     ▼                                                            │
-Feature Engineering                                               │
-(60+ features: lag stats, YoY deltas, efficiency metrics)         │
-     │                                                            │
-     ▼                                                            │
-Model Training                                                    │
-  ┌─────────┐  ┌───────────────┐  ┌──────────┐                   │
-  │ XGBoost │  │ Random Forest │  │ LightGBM │  ← best           │
-  └─────────┘  └───────────────┘  └──────────┘                   │
-     │                                                            │
-     ▼                                                            │
-SHAP Explainability  →  Claude Scouting Reports                   │
-     │                                                            │
-     ▼                                                            │
-Streamlit Dashboard ◄─────────────────────────────────────────────┘
+ SQLite DB
+(nba.db)
+     │
+     ▼
+Feature Engineering
+(60+ features: lag stats, YoY deltas, efficiency metrics)
+     │
+     ▼
+Model Training
+  ┌─────────┐  ┌───────────────┐  ┌──────────┐
+  │ XGBoost │  │ Random Forest │  │ LightGBM │  ← best
+  └─────────┘  └───────────────┘  └──────────┘
+     │
+     ▼
+SHAP Explainability
+     │
+     ▼
+Streamlit Dashboard
   • Top 20 Candidates  • Player Deep Dive  • Model Performance
 ```
 
@@ -60,7 +59,7 @@ Streamlit Dashboard ◄───────────────────
 | **Data** | `nba_api`, `pandas`, `SQLite` |
 | **Features** | `pandas`, `numpy` |
 | **Modeling** | `scikit-learn`, `xgboost`, `lightgbm`, `joblib` |
-| **Explainability** | `shap` (TreeExplainer), `anthropic` (Claude API) |
+| **Explainability** | `shap` (TreeExplainer) |
 | **Dashboard** | `streamlit`, `plotly` |
 
 ---
@@ -104,10 +103,7 @@ python src/features/engineer.py
 # 4. Train models and evaluate on held-out 2025-26 season
 python src/models/train.py
 
-# 5. (Optional) Generate Claude scouting reports
-ANTHROPIC_API_KEY=your-key python src/explainability/llm_reporter.py
-
-# 6. Launch the dashboard
+# 5. Launch the dashboard
 streamlit run app/dashboard.py
 ```
 
@@ -130,8 +126,7 @@ NBA_star_finder/
 │   ├── models/
 │   │   └── train.py              # XGBoost / RF / LightGBM training & evaluation
 │   └── explainability/
-│       ├── shap_explainer.py     # SHAP TreeExplainer — top drivers per player
-│       └── llm_reporter.py       # Claude scouting report generation & caching
+│       └── shap_explainer.py     # SHAP TreeExplainer — top drivers per player
 ├── models/                       # Saved .joblib model artifacts + metrics.json
 ├── data/                         # nba.db, features.parquet, raw JSON cache
 ├── reports/                      # Per-player scouting report JSON
